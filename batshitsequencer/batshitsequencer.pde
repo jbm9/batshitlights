@@ -24,6 +24,10 @@ class Toggle {
   void click() {
     state = state ? false : true;
   }
+
+  int state() {
+    return state ? 1 : 0;
+  }
 }
 
 class ToggleMatrix {
@@ -73,7 +77,7 @@ class ToggleMatrix {
     }
   }
 
-  void click(float x, float y) {
+  boolean click(float x, float y) {
     int c = (int)((x - base_x) /step_x);
     int r = (int)(y - base_y) / (int)step_y;
 
@@ -83,10 +87,31 @@ class ToggleMatrix {
     try {
       Toggle b = (Toggle)( (ArrayList)buttons.get(r)).get(c);
       b.click();
+      return true;
     } catch(Exception e) { // XXX Handle this for real
+      return false;
+    }
+  }
+
+  String toString() {
+    String retval = "";
+
+    for(int i = 0; i < buttons.size(); i++) {
+      ArrayList cur_row = (ArrayList)buttons.get(i);
+
+      String cur_val = "";
+
+      for(int j = 0; j < cur_row.size(); j++) {
+        Toggle t = (Toggle)cur_row.get(j);
+        cur_val += t.state();
+      }
+
+      cur_val += "\n";
+      retval += cur_val;
     }
 
-    
+
+    return retval;
   }
 }
 
@@ -101,13 +126,20 @@ void setup() {
 
   buttonMatrix = new ToggleMatrix(100,100, 200,250, 50,50);
 
+  buttonMatrix.draw();
 }
 
 
 void draw() {
-  buttonMatrix.draw();
+  delay(25);
 }
 
 void mouseReleased() {
   buttonMatrix.click(mouseX, mouseY); // magic constants yay!
+  buttonMatrix.draw();
+
+  String s = buttonMatrix.toString();
+
+  println("Current State:");
+  print(s);
 }
