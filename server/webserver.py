@@ -6,7 +6,7 @@ from urlparse import urlparse
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import signal
 #from RelayControl import RelayControl, ComtrolRelayControl
-from RelayControl import RelayControl, SerialRelayControl
+#from RelayControl import RelayControl, SerialRelayControl
 import ConfigParser
 import logging, logging.config
 
@@ -106,7 +106,7 @@ class LightsHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 (channel, val) = self.path2channel()
                 self.server.log.info("Setting chan: %d to %d" %(channel,val))
-                self.server.RC.set(channel,val)
+                #self.server.RC.set(channel,val)
                 #
                 #statusstr = self.server.RC.getstate()
                 statusstr="11111111"
@@ -178,7 +178,7 @@ def main():
         server = HTTPServer(('', port), LightsHandler)
         server.log = svrlog
         server.log.info("Running on port %d and ready to serve!" % port)
-        server.RC = myRC
+        #server.RC = myRC
         server.serve_forever()
     except KeyboardInterrupt:
         print '^C received, shutting down server'
