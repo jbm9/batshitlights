@@ -3,4 +3,4 @@ exec 2>&1
 export LANG=C
 sleep 10
 cd /home/lights/batshitlights/server
-exec setuidgid python filelooop.py
+exec setuidgid lights python filelooop.py
