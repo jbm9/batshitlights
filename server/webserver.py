@@ -88,12 +88,18 @@ class LightsHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-type','text/html')
                 self.end_headers()
 
-                #self.wfile.write("Files:")
                 files = [ f for f in listdir("/home/lights/batshitlights/sequences") if f.endswith(".seq") ]
-                #self.wfile.write(repr(files))
+
+                header = open("/home/lights/batshitlights/html/header.html")
+                self.wfile.write(header.read())
+		header.close()
 
                 for f in files:
                     self.wfile.write("<li><a href=/%s>%s</a><p>" % (f,f) )
+
+                footer = open("/home/lights/batshitlights/html/footer.html")
+                self.wfile.write(footer.read())
+		footer.close()
 
             if self.path.endswith(".html"):
                 f = open(curdir + sep + self.path) #self.path has /test.html
