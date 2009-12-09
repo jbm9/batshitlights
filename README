@@ -1,0 +1,94 @@
+batshitlights: A project to create Batshit xmas lights for Noisebridge
+
+The contents of this directory are expected to be checked out to user lights's
+home directory, in /home/lights/batshitlights.  A quick rundown of the
+important files:
+
+	/home/lights/batshitlights/server/filelooop.py
+
+		This is the script that runs forever, and does the Actual
+		Work of switching the lights on and off.  It reads the file
+		/home/lights/batshitlights/sequences/active, which defines
+		the light sequence, and then uses the RelayControl class to
+		communicate with the external relay bank.
+
+	/home/lights/batshitlights/sequences/active
+
+		The file read by filelooop.py that defines the light
+		sequence currently active.  The first line of this file
+		defines how long (in milliseconds) we should sleep before
+		advancing to the next state.  The rest of the file is a
+		list of states to iterate through.  For example:
+
+			1000
+			10000000
+			01000000
+			00100000
+			00010000
+			00001000
+			00000100
+			00000010
+			00000001
+
+		We sleep for 1 second (1000 milliseconds) between states.
+		In the first state, the first light is on, and the rest
+		are off.  In the second state, the second light is on, and
+		the rest are off.  In the third state, the third light is
+		on, and the rest are off.  etc.
+
+		(There's code in place in filelooop.py to also support
+		state lines in the syntax of "<state> <delay>", to sleep
+		for an amount of time different than the "global delay",
+		but I haven't actually tested this behavior yet.)
+
+	/home/lights/batshitlights/sequences/*.seq
+
+		A list of pre-programed sequences.
+
+	/home/lights/batshitlights/server/webserver.py
+
+		A full webserver/framework implementation, currently
+		configured to listen on port 8080.  When you request "/",
+		it returns a list of hyperlinks to each of the *.seq files
+		in lights's home directory.  If you click on one of those
+		links, it copies the contents from the *.seq file to
+		/home/lights/batshitlights/sequences/active, so filelooop.py
+		will start processing it instead of whatever it was previously
+		processing.
+
+	/home/lights/batshitlights/set.html
+
+		When you use webserver.py to request a *.seq file, it
+		returns the contents of /home/lights/batshitlights/set.html
+		to the browser.  Right now, this file contains just
+		"<h1>Thanks!</h1>".  We should make it look pretty, and
+		probably also have a meta refresh to redirect the user
+		back to / (the directory listing) after a few seconds,
+		or something.
+
+		If we want to get fancy, we should also look into using
+		one of the python templating libraries, so we can have a
+		static index.html page independent of the code, and then
+		make that index.html file look pretty, too.  We just need
+		to find out how to interpolate a list of files to display
+		in he the directory listing.
+
+	/home/lights/batshitlights/service/fileloop/
+	/home/lights/batshitlights/service/webserver/
+
+		Each of these directories should be symlinked from
+		/etc/service, so daemontools can find them.  They're
+		responsible for starting (and restarting when necessary)
+		the fileloop.py and webserver.py processes.  Those
+		directories are also configured to have daemontools log
+		via multilog to /var/log/fileloop, and /var/log/webserver.
+
+	/home/lights/batshitlights/rc.local
+
+		The contents of this file should be copied to /etc/rc.local,
+		to be executed on boot.  Because Ubuntu is apparently using
+		some new fangled init system (really, guys?), the
+		daemontools-run package is broken, so we need to kick off
+		daemontools by hand.  This is also responsible for running
+		iptables to redirect port 80 to 8080, and for chmoding access
+		to /dev/ttyS0.

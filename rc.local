@@ -1,0 +1,10 @@
+#!/bin/sh -e
+
+chmod 666 /dev/ttyS0 || true
+
+/usr/bin/svscanboot &
+
+iptables -t nat -F PREROUTING || true
+iptables -t nat -A PREROUTING --dst 75.101.62.91 -p tcp --dport 80 -j DNAT --to 75.101.62.91:8080 || true
+
+exit 0

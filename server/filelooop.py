@@ -1,4 +1,5 @@
-import select
+# vim:set ts=4 sw=4 ai et:
+
 import os
 import RelayControl
 import time
@@ -15,22 +16,14 @@ def updatestate(rc, s):
         pos = pos + 1
 
 while True:
-    # select
-    # if read event
-    #   read line, parse/act
-    #       parse: begin => reset next buffer
-    #              end => swap buffers
-    #              [01]
-    # if not, step to next command in cur buffer
-
-    f = open("/home/lights/sequence")
+    f = open("/home/lights/batshitlights/sequences/active")
     globaldelay = int(f.readline())
     print "My globaldelay is " + repr(globaldelay)
 
     for line in f:
         tokens = line.strip().split()
         command = tokens[0]
-        delay = len(tokens) > 1 and tokens or globaldelay
+        delay = len(tokens) > 1 and int(tokens[1]) or globaldelay
         updatestate(rc, line)
         time.sleep(delay/1000.0)
 

@@ -2,11 +2,12 @@
 
 import string,cgi,time,sys
 from os import curdir, sep, listdir
+import os
 from urlparse import urlparse
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import signal
 #from RelayControl import RelayControl, ComtrolRelayControl
-from RelayControl import RelayControl, SerialRelayControl
+#from RelayControl import RelayControl, SerialRelayControl
 import ConfigParser
 import logging, logging.config
 
@@ -55,11 +56,12 @@ class LightsHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             self.parsed_path = urlparse(self.path)
+
             if self.path.endswith(".seq"):
                 #f = open(curdir + sep + self.path) #self.path has /test.html
                 #f = open("/home/lights" + self.parsed_path[-1])
-                input = open("/home/lights" + self.path)
-                output = open("/home/lights/sequence", "w")
+                input = open("/home/lights/batshitlights/sequences" + self.path)
+                output = open("/home/lights/batshitlights/sequences/active", "w")
 
                 output.write(input.read())
 
@@ -70,23 +72,34 @@ class LightsHandler(BaseHTTPRequestHandler):
                 #input.seek(0, 0)
                 #self.wfile.write(input.read())
 
-                displayhtml = open("/home/lights/set.html")
+                displayhtml = open("/home/lights/batshitlights/html/set.html")
                 self.wfile.write(displayhtml.read())
 
                 input.close()
                 output.close()
+
+		# Total kludge to restart fileloop.py, and get the new sequence
+		# running faster.  Otherwise, we need to wait for the current
+		# sequence to finish before it re-reads the file again.
+		os.system('kill -HUP $(cat /var/run/fileloop.py) &> /dev/null')
 
             if self.parsed_path[2] == "/":
                 self.send_response(200)
                 self.send_header('Content-type','text/html')
                 self.end_headers()
 
-                #self.wfile.write("Files:")
-                files = [ f for f in listdir("/home/lights") if f.endswith(".seq") ]
-                #self.wfile.write(repr(files))
+                files = [ f for f in listdir("/home/lights/batshitlights/sequences") if f.endswith(".seq") ]
+
+                header = open("/home/lights/batshitlights/html/header.html")
+                self.wfile.write(header.read())
+		header.close()
 
                 for f in files:
-                    self.wfile.write("<li><a href=/%s>%s</a><p>" % (f,f) )
+                    self.wfile.write("<li><a href=/%s>%s</a><p>\n" % (f,f) )
+
+                footer = open("/home/lights/batshitlights/html/footer.html")
+                self.wfile.write(footer.read())
+		footer.close()
 
             if self.path.endswith(".html"):
                 f = open(curdir + sep + self.path) #self.path has /test.html
@@ -106,7 +119,7 @@ class LightsHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 (channel, val) = self.path2channel()
                 self.server.log.info("Setting chan: %d to %d" %(channel,val))
-                self.server.RC.set(channel,val)
+                #self.server.RC.set(channel,val)
                 #
                 #statusstr = self.server.RC.getstate()
                 statusstr="11111111"
@@ -169,7 +182,7 @@ def main():
 
     #myRC = SerialRelayControl(length=8)
     #myRC = SocketRelayControl(length=8,cfg=cfg)
-    myRC = SerialRelayControl(length=8,cfg=cfg)
+    #myRC = SerialRelayControl(length=8,cfg=cfg)
 
     # create logger (using config file for config)
     svrlog = logging.getLogger('serverlog')
@@ -178,7 +191,7 @@ def main():
         server = HTTPServer(('', port), LightsHandler)
         server.log = svrlog
         server.log.info("Running on port %d and ready to serve!" % port)
-        server.RC = myRC
+        #server.RC = myRC
         server.serve_forever()
     except KeyboardInterrupt:
         print '^C received, shutting down server'
