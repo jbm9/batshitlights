@@ -95,7 +95,7 @@ class LightsHandler(BaseHTTPRequestHandler):
 		header.close()
 
                 for f in files:
-                    self.wfile.write("<li><a href=/%s>%s</a><p>" % (f,f) )
+                    self.wfile.write("<li><a href=/%s>%s</a><p>\n" % (f,f) )
 
                 footer = open("/home/lights/batshitlights/html/footer.html")
                 self.wfile.write(footer.read())
