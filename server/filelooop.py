@@ -15,14 +15,6 @@ def updatestate(rc, s):
         pos = pos + 1
 
 while True:
-    # select
-    # if read event
-    #   read line, parse/act
-    #       parse: begin => reset next buffer
-    #              end => swap buffers
-    #              [01]
-    # if not, step to next command in cur buffer
-
     f = open("/home/lights/sequence")
     globaldelay = int(f.readline())
     print "My globaldelay is " + repr(globaldelay)
