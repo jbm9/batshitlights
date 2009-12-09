@@ -2,6 +2,7 @@
 
 import string,cgi,time,sys
 from os import curdir, sep, listdir
+import os
 from urlparse import urlparse
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import signal
@@ -55,6 +56,7 @@ class LightsHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             self.parsed_path = urlparse(self.path)
+
             if self.path.endswith(".seq"):
                 #f = open(curdir + sep + self.path) #self.path has /test.html
                 #f = open("/home/lights" + self.parsed_path[-1])
@@ -75,6 +77,11 @@ class LightsHandler(BaseHTTPRequestHandler):
 
                 input.close()
                 output.close()
+
+		# Total kludge to restart fileloop.py, and get the new sequence
+		# running faster.  Otherwise, we need to wait for the current
+		# sequence to finish before it re-reads the file again.
+		os.system('kill -HUP $(cat /var/run/fileloop.py) &> /dev/null')
 
             if self.parsed_path[2] == "/":
                 self.send_response(200)

@@ -2,5 +2,6 @@
 exec 2>&1
 export LANG=C
 sleep 1
+echo $$ > /var/run/fileloop.py
 cd /home/lights/batshitlights/server
 exec setuidgid lights python -u filelooop.py
