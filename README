@@ -8,11 +8,11 @@ important files:
 
 		This is the script that runs forever, and does the Actual
 		Work of switching the lights on and off.  It reads the file
-		/home/lights/batshitlights/sequence, which defines the light
-		sequence, and then uses the RelayControl class to communicate
-		with the external relay bank.
+		/home/lights/batshitlights/sequences/active, which defines
+		the light sequence, and then uses the RelayControl class to
+		communicate with the external relay bank.
 
-	/home/lights/batshitlights/sequence
+	/home/lights/batshitlights/sequences/active
 
 		The file read by filelooop.py that defines the light
 		sequence currently active.  The first line of this file
@@ -41,7 +41,7 @@ important files:
 		for an amount of time different than the "global delay",
 		but I haven't actually tested this behavior yet.)
 
-	/home/lights/batshitlights/*.seq
+	/home/lights/batshitlights/sequences/*.seq
 
 		A list of pre-programed sequences.
 
@@ -52,8 +52,8 @@ important files:
 		it returns a list of hyperlinks to each of the *.seq files
 		in lights's home directory.  If you click on one of those
 		links, it copies the contents from the *.seq file to
-		/home/lights/batshitlights/sequence, so filelooop.py will
-		start processing it instead of whatever it was previously
+		/home/lights/batshitlights/sequences/active, so filelooop.py
+		will start processing it instead of whatever it was previously
 		processing.
 
 	/home/lights/batshitlights/set.html

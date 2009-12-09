@@ -16,7 +16,7 @@ def updatestate(rc, s):
         pos = pos + 1
 
 while True:
-    f = open("/home/lights/batshitlights/sequence")
+    f = open("/home/lights/batshitlights/sequences/active")
     globaldelay = int(f.readline())
     print "My globaldelay is " + repr(globaldelay)
 

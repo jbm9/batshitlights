@@ -58,8 +58,8 @@ class LightsHandler(BaseHTTPRequestHandler):
             if self.path.endswith(".seq"):
                 #f = open(curdir + sep + self.path) #self.path has /test.html
                 #f = open("/home/lights" + self.parsed_path[-1])
-                input = open("/home/lights/batshitlights" + self.path)
-                output = open("/home/lights/batshitlights/sequence", "w")
+                input = open("/home/lights/batshitlights/sequences" + self.path)
+                output = open("/home/lights/batshitlights/sequences/active", "w")
 
                 output.write(input.read())
 
