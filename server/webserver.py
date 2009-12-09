@@ -58,8 +58,8 @@ class LightsHandler(BaseHTTPRequestHandler):
             if self.path.endswith(".seq"):
                 #f = open(curdir + sep + self.path) #self.path has /test.html
                 #f = open("/home/lights" + self.parsed_path[-1])
-                input = open("/home/lights" + self.path)
-                output = open("/home/lights/sequence", "w")
+                input = open("/home/lights/batshitlights" + self.path)
+                output = open("/home/lights/batshitlights/sequence", "w")
 
                 output.write(input.read())
 
@@ -70,7 +70,7 @@ class LightsHandler(BaseHTTPRequestHandler):
                 #input.seek(0, 0)
                 #self.wfile.write(input.read())
 
-                displayhtml = open("/home/lights/set.html")
+                displayhtml = open("/home/lights/batshitlights/set.html")
                 self.wfile.write(displayhtml.read())
 
                 input.close()
@@ -82,7 +82,7 @@ class LightsHandler(BaseHTTPRequestHandler):
                 self.end_headers()
 
                 #self.wfile.write("Files:")
-                files = [ f for f in listdir("/home/lights") if f.endswith(".seq") ]
+                files = [ f for f in listdir("/home/lights/batshitlights") if f.endswith(".seq") ]
                 #self.wfile.write(repr(files))
 
                 for f in files:
