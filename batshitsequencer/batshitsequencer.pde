@@ -1,23 +1,33 @@
-class Button {
+class Toggle {
   float x1,y1, x2,y2;
+  boolean state;
 
-  Button (float _x1, float _y1, float _x2, float _y2) {
+  Toggle (float _x1, float _y1, float _x2, float _y2) {
     x1 = _x1;
     y1 = _y1;
     x2 = _x2;
     y2 = _y2;
+
+    state = false;
   }
 
   void draw() {
+    if (state) {
+      fill(255, 0, 0);
+    } else {
+      fill(255);
+    }
     rect(x1,y1, x2-x1,y2-y1);
+    noFill();
   }
 
   void click() {
     println("Click!");
+    state = state ? false : true;
   }
 }
 
-class ButtonMatrix {
+class ToggleMatrix {
   ArrayList buttons;
 
   float base_x = 0;
@@ -29,7 +39,7 @@ class ButtonMatrix {
   float step_x = 0;
   float step_y = 0;
 
-  ButtonMatrix (float width, float height, float x_step, float y_step) {
+  ToggleMatrix (float width, float height, float x_step, float y_step) {
     buttons = new ArrayList();
 
     max_x = width;
@@ -44,7 +54,7 @@ class ButtonMatrix {
     for(int r = 0; r < rows; r++) {
       ArrayList cur_row = new ArrayList();
       for(int c = 0; c < cols; c++) {
-        Button b = new Button(r*x_step, c*y_step, (r+1)*x_step, (c+1)*y_step);
+        Toggle b = new Toggle(r*x_step, c*y_step, (r+1)*x_step, (c+1)*y_step);
         cur_row.add(b);
       }
       buttons.add(cur_row);
@@ -55,7 +65,7 @@ class ButtonMatrix {
     for(int r = 0; r < buttons.size(); r++) {
       ArrayList cur_row = (ArrayList) buttons.get(r);
       for(int c = 0; c < cur_row.size(); c++) {
-        Button b = (Button) cur_row.get(c);
+        Toggle b = (Toggle) cur_row.get(c);
         b.draw();
       }
     }
@@ -65,7 +75,7 @@ class ButtonMatrix {
     int r = (int)(x - base_x) / (int)step_x;
     int c = (int)(y - base_y) / (int)step_y;
 
-    Button b = (Button)( (ArrayList)buttons.get(r)).get(c);
+    Toggle b = (Toggle)( (ArrayList)buttons.get(r)).get(c);
 
     b.click();
     
@@ -73,7 +83,7 @@ class ButtonMatrix {
 }
 
 
-ButtonMatrix buttonMatrix;
+ToggleMatrix buttonMatrix;
 
 void setup() {
   size(400, 450);
@@ -81,7 +91,7 @@ void setup() {
 
   background(255);
 
-  buttonMatrix = new ButtonMatrix(400, 450, 50, 50);
+  buttonMatrix = new ToggleMatrix(400, 450, 50, 50);
 
 }
 
