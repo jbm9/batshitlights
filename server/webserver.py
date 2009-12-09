@@ -82,7 +82,7 @@ class LightsHandler(BaseHTTPRequestHandler):
                 self.end_headers()
 
                 #self.wfile.write("Files:")
-                files = [ f for f in listdir("/home/lights/batshitlights") if f.endswith(".seq") ]
+                files = [ f for f in listdir("/home/lights/batshitlights/sequences") if f.endswith(".seq") ]
                 #self.wfile.write(repr(files))
 
                 for f in files:
