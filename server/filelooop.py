@@ -1,3 +1,5 @@
+# vim:set ts=4 sw=4 ai et:
+
 import os
 import RelayControl
 import time
@@ -21,7 +23,7 @@ while True:
     for line in f:
         tokens = line.strip().split()
         command = tokens[0]
-        delay = len(tokens) > 1 and tokens or globaldelay
+        delay = len(tokens) > 1 and int(tokens[1]) or globaldelay
         updatestate(rc, line)
         time.sleep(delay/1000.0)
 
