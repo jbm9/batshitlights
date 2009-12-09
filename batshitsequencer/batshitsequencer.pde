@@ -22,7 +22,6 @@ class Toggle {
   }
 
   void click() {
-    println("Click!");
     state = state ? false : true;
   }
 }
@@ -39,13 +38,16 @@ class ToggleMatrix {
   float step_x = 0;
   float step_y = 0;
 
-  ToggleMatrix (float width, float height, float x_step, float y_step) {
+  ToggleMatrix (float x_base, float y_base, float width, float height, float x_step, float y_step) {
     buttons = new ArrayList();
+    // XXX eww... variables need renamed.
+    base_x = x_base;
+    base_y = y_base;
 
-    max_x = width;
-    max_y = height;
+    max_x = x_base+width;
+    max_y = x_base+height;
 
-    step_x = x_step; // XXX eww?
+    step_x = x_step;
     step_y = y_step;
 
     int rows = (int)height/(int)y_step;
@@ -54,7 +56,7 @@ class ToggleMatrix {
     for(int r = 0; r < rows; r++) {
       ArrayList cur_row = new ArrayList();
       for(int c = 0; c < cols; c++) {
-        Toggle b = new Toggle(r*x_step, c*y_step, (r+1)*x_step, (c+1)*y_step);
+        Toggle b = new Toggle(base_x+c*x_step, base_y+r*y_step, base_x+(c+1)*x_step, base_y+(r+1)*y_step);
         cur_row.add(b);
       }
       buttons.add(cur_row);
@@ -72,12 +74,18 @@ class ToggleMatrix {
   }
 
   void click(float x, float y) {
-    int r = (int)(x - base_x) / (int)step_x;
-    int c = (int)(y - base_y) / (int)step_y;
+    int c = (int)((x - base_x) /step_x);
+    int r = (int)(y - base_y) / (int)step_y;
 
-    Toggle b = (Toggle)( (ArrayList)buttons.get(r)).get(c);
+    println("Click " + x + "," + y + " => " + r + "," + c);
 
-    b.click();
+
+    try {
+      Toggle b = (Toggle)( (ArrayList)buttons.get(r)).get(c);
+      b.click();
+    } catch(Exception e) { // XXX Handle this for real
+    }
+
     
   }
 }
@@ -91,7 +99,7 @@ void setup() {
 
   background(255);
 
-  buttonMatrix = new ToggleMatrix(400, 450, 50, 50);
+  buttonMatrix = new ToggleMatrix(100,100, 200,250, 50,50);
 
 }
 
