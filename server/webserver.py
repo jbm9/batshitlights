@@ -169,7 +169,7 @@ def main():
 
     #myRC = SerialRelayControl(length=8)
     #myRC = SocketRelayControl(length=8,cfg=cfg)
-    myRC = SerialRelayControl(length=8,cfg=cfg)
+    #myRC = SerialRelayControl(length=8,cfg=cfg)
 
     # create logger (using config file for config)
     svrlog = logging.getLogger('serverlog')
