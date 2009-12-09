@@ -1,0 +1,2 @@
+#!/bin/bash
+exec multilog t s5242880 n1000 !gzip /var/log/fileloop
