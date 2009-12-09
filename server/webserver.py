@@ -9,6 +9,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import signal
 import ConfigParser
 import logging, logging.config
+import re
 
 class LightsHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -21,14 +22,17 @@ class LightsHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-type','text/html')
                 self.end_headers()
 
-                files = [ f for f in listdir("/home/lights/batshitlights/sequences") if f.endswith(".seq") ]
+                p = re.compile('\.seq$')
+                p.sub('', "foo.seq")
+
+                files = [ p.sub('', f) for f in listdir("/home/lights/batshitlights/sequences") if f.endswith(".seq") ]
 
                 header = open("/home/lights/batshitlights/html/header.html")
                 self.wfile.write(header.read())
                 header.close()
 
                 for f in sorted(files):
-                    self.wfile.write("<li><a href=/%s>%s</a><p>\n" % (f,f) )
+                    self.wfile.write("<li><a href=/%s.seq>%s</a><p>\n" % (f,f) )
 
                 footer = open("/home/lights/batshitlights/html/footer.html")
                 self.wfile.write(footer.read())
