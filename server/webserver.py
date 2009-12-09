@@ -70,7 +70,7 @@ class LightsHandler(BaseHTTPRequestHandler):
                 #input.seek(0, 0)
                 #self.wfile.write(input.read())
 
-                displayhtml = open("/home/lights/batshitlights/set.html")
+                displayhtml = open("/home/lights/batshitlights/html/set.html")
                 self.wfile.write(displayhtml.read())
 
                 input.close()
