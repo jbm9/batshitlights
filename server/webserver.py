@@ -81,7 +81,8 @@ class LightsHandler(BaseHTTPRequestHandler):
 		# Total kludge to restart fileloop.py, and get the new sequence
 		# running faster.  Otherwise, we need to wait for the current
 		# sequence to finish before it re-reads the file again.
-		os.system('kill -HUP $(cat /var/run/fileloop.py) &> /dev/null')
+		#os.system('kill -HUP $(cat /var/run/fileloop.py) &> /dev/null')
+		os.system('sudo svc -t /etc/service/fileloop')
 
             if self.parsed_path[2] == "/":
                 self.send_response(200)
