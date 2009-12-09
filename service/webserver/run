@@ -3,4 +3,4 @@ exec 2>&1
 export LANG=C
 sleep 1
 cd /home/lights/batshitlights/server
-exec setuidgid lights python webserver.py
+exec setuidgid lights python -u webserver.py
