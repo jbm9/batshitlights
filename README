@@ -1,18 +1,18 @@
 batshitlights: A project to create Batshit xmas lights for Noisebridge
 
-The contents of this directory are expected to be checked out to user
-lights's home directory, in /home/lights.  A quick rundown of the important
-files:
+The contents of this directory are expected to be checked out to user lights's
+home directory, in /home/lights/batshitlights.  A quick rundown of the
+important files:
 
-	/home/lights/server/filelooop.py
+	/home/lights/batshitlights/server/filelooop.py
 
 		This is the script that runs forever, and does the Actual
-		Work of switching the lights on and off.  It reads the
-		file /home/lights/sequence, which defines the light
-		sequence, and then uses the RelayControl class to
-		communicate with the external relay bank.
+		Work of switching the lights on and off.  It reads the file
+		/home/lights/batshitlights/sequence, which defines the light
+		sequence, and then uses the RelayControl class to communicate
+		with the external relay bank.
 
-	/home/lights/sequence
+	/home/lights/batshitlights/sequence
 
 		The file read by filelooop.py that defines the light
 		sequence currently active.  The first line of this file
@@ -41,26 +41,26 @@ files:
 		for an amount of time different than the "global delay",
 		but I haven't actually tested this behavior yet.)
 
-	/home/lights/*.seq
+	/home/lights/batshitlights/*.seq
 
 		A list of pre-programed sequences.
 
-	/home/lights/server/webserver.py
+	/home/lights/batshitlights/server/webserver.py
 
 		A full webserver/framework implementation, currently
 		configured to listen on port 8080.  When you request "/",
 		it returns a list of hyperlinks to each of the *.seq files
 		in lights's home directory.  If you click on one of those
 		links, it copies the contents from the *.seq file to
-		/home/lights/sequence, so filelooop.py will start
-		processing it instead of whatever it was previously
+		/home/lights/batshitlights/sequence, so filelooop.py will
+		start processing it instead of whatever it was previously
 		processing.
 
-	/home/lights/set.html
+	/home/lights/batshitlights/set.html
 
 		When you use webserver.py to request a *.seq file, it
-		returns the contents of /home/lights/set.html to the
-		browser.  Right now, this file contains just
+		returns the contents of /home/lights/batshitlights/set.html
+		to the browser.  Right now, this file contains just
 		"<h1>Thanks!</h1>".  We should make it look pretty, and
 		probably also have a meta refresh to redirect the user
 		back to / (the directory listing) after a few seconds,
@@ -73,14 +73,22 @@ files:
 		to find out how to interpolate a list of files to display
 		in he the directory listing.
 
-What isn't listed here is the /etc/rc.local script (which I forgot to copy
-off the box), which does some su and bash magic to run fileloop.py and
-webserver.py in a loop (sometimes they stop working and die).  They also
-redirect stdout and stderr to logfiles in /home/lights.  We may want to
-turn this off for fileloop.py, because it prints a lot of debugging
-information that we don't need to be filling the disk with.  And, really,
-this rc.local script needs to go away, and be replaced with something like
-daemontools, or a real init.d script, so we can easily restart services
-when we're modifying them.  Also important to note, you need to cd to
-/home/lights/server before starting webserver.py, or it throws a bunch of
-errors and just dies.
+	/home/lights/batshitlights/service/fileloop/
+	/home/lights/batshitlights/service/webserver/
+
+		Each of these directories should be symlinked from
+		/etc/service, so daemontools can find them.  They're
+		responsible for starting (and restarting when necessary)
+		the fileloop.py and webserver.py processes.  Those
+		directories are also configured to have daemontools log
+		via multilog to /var/log/fileloop, and /var/log/webserver.
+
+	/home/lights/batshitlights/rc.local
+
+		The contents of this file should be copied to /etc/rc.local,
+		to be executed on boot.  Because Ubuntu is apparently using
+		some new fangled init system (really, guys?), the
+		daemontools-run package is broken, so we need to kick off
+		daemontools by hand.  This is also responsible for running
+		iptables to redirect port 80 to 8080, and for chmoding access
+		to /dev/ttyS0.
