@@ -67,6 +67,7 @@ class LightsHandler(BaseHTTPRequestHandler):
                 png = open("/home/lights/batshitlights/html/" + self.path)
                 self.send_response(200)
                 self.send_header('Content-type','image/png')
+                self.send_header('Content-Length', os.fstat(png.fileno())[6])
                 self.end_headers()
                 self.wfile.write(png.read())
                 png.close()
