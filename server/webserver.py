@@ -62,6 +62,15 @@ class LightsHandler(BaseHTTPRequestHandler):
                 os.system('sudo svc -t /etc/service/fileloop')
                 return
  
+            # A request to set a specific sequence file
+            if self.path.endswith(".png"):
+                png = open("/home/lights/batshitlights/html/" + self.path)
+                self.send_response(200)
+                self.send_header('Content-type','image/png')
+                self.end_headers()
+                self.wfile.write(png.read())
+                png.close()
+                return
         #except: 
         except IOError:
             self.send_error(400,'Something bad happened: %s' % self.path)
