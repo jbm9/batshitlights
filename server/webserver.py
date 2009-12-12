@@ -12,66 +12,91 @@ import logging, logging.config
 import re
 
 class LightsHandler(BaseHTTPRequestHandler):
+    def base_path(self):
+        return os.path.abspath( os.path.dirname(__file__) + "/..")
+
+    def params(self, s):
+        d = dict( map(lambda s:s.split("=", 2), s.split("&")) )
+        return d
+
+    def handle_root(self):
+        self.send_response(200)
+        self.send_header('Content-type','text/html')
+        self.end_headers()
+
+        p = re.compile('\.seq$')
+        p.sub('', "foo.seq")
+
+        files = [ p.sub('', f) for f in listdir(self.base_path() + "/sequences") if f.endswith(".seq") ]
+
+        header = open(self.base_path() + "/html/header.html")
+        self.wfile.write(header.read())
+        header.close()
+
+        for f in sorted(files):
+            self.wfile.write("<li><a href=/%s.seq>%s</a></li>\n" % (f,f) )
+
+        footer = open(self.base_path() + "/html/footer.html")
+        self.wfile.write(footer.read())
+        footer.close()
+        return
+
+    def handle_seq(self):
+        input = open(self.base_path() + "/sequences" + self.path)
+        output = open(self.base_path() + "/sequences/active", "w")
+        output.write(input.read())
+        input.close()
+        output.close()
+
+        self.send_response(200)
+        self.send_header('Content-type','text/html')
+        self.end_headers()
+
+        displayhtml = open(self.base_path() + "/html/set.html")
+        self.wfile.write(displayhtml.read())
+        displayhtml.close()
+
+        # Total kludge to restart fileloop.py, and get the new sequence
+        # running faster.  Otherwise, we need to wait for the current
+        # sequence to finish before it re-reads the file again.
+        #os.system('kill -HUP $(cat /var/run/fileloop.py) &> /dev/null')
+        os.system('sudo svc -t /etc/service/fileloop')
+        return
+
+    def handle_png(self):
+        png = open(self.base_path() + "/html/" + self.path)
+        self.send_response(200)
+        self.send_header('Content-type','image/png')
+        self.send_header('Content-Length', os.fstat(png.fileno())[6])
+        self.end_headers()
+        self.wfile.write(png.read())
+        png.close()
+        return
+
+    def handle_run_one(self):
+        return
+
+
     def do_GET(self):
         try:
             self.parsed_path = urlparse(self.path)
 
+            requested_path = self.parsed_path[2]
+
             # Directory listing
-            if self.parsed_path[2] == "/":
-                self.send_response(200)
-                self.send_header('Content-type','text/html')
-                self.end_headers()
+            if requested_path == "/":
+                return self.handle_root()
 
-                p = re.compile('\.seq$')
-                p.sub('', "foo.seq")
-
-                files = [ p.sub('', f) for f in listdir("/home/lights/batshitlights/sequences") if f.endswith(".seq") ]
-
-                header = open("/home/lights/batshitlights/html/header.html")
-                self.wfile.write(header.read())
-                header.close()
-
-                for f in sorted(files):
-                    self.wfile.write("<li><a href=/%s.seq>%s</a></li>\n" % (f,f) )
-
-                footer = open("/home/lights/batshitlights/html/footer.html")
-                self.wfile.write(footer.read())
-                footer.close()
-                return
+            if requested_path == "/run_one":
+                return self.handle_run_one()
 
             # A request to set a specific sequence file
-            if self.path.endswith(".seq"):
-                input = open("/home/lights/batshitlights/sequences" + self.path)
-                output = open("/home/lights/batshitlights/sequences/active", "w")
-                output.write(input.read())
-                input.close()
-                output.close()
-
-                self.send_response(200)
-                self.send_header('Content-type','text/html')
-                self.end_headers()
-
-                displayhtml = open("/home/lights/batshitlights/html/set.html")
-                self.wfile.write(displayhtml.read())
-                displayhtml.close()
-
-                # Total kludge to restart fileloop.py, and get the new sequence
-                # running faster.  Otherwise, we need to wait for the current
-                # sequence to finish before it re-reads the file again.
-                #os.system('kill -HUP $(cat /var/run/fileloop.py) &> /dev/null')
-                os.system('sudo svc -t /etc/service/fileloop')
-                return
+            if requested_path.endswith(".seq"):
+                return self.handle_seq()
  
             # A request to set a specific sequence file
-            if self.path.endswith(".png"):
-                png = open("/home/lights/batshitlights/html/" + self.path)
-                self.send_response(200)
-                self.send_header('Content-type','image/png')
-                self.send_header('Content-Length', os.fstat(png.fileno())[6])
-                self.end_headers()
-                self.wfile.write(png.read())
-                png.close()
-                return
+            if requested_path.endswith(".png"):
+                return self.handle_png()
         #except: 
         except IOError:
             self.send_error(400,'Something bad happened: %s' % self.path)
