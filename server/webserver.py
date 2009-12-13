@@ -65,6 +65,14 @@ class LightsHandler(BaseHTTPRequestHandler):
         os.system('sudo svc -t /etc/service/fileloop')
         return
 
+    def handle_active(self):
+        input = open(self.base_path() + "/sequences/active")
+        self.send_response(200)
+        self.send_header('Content-type','text/plain')
+        self.end_headers()
+        self.wfile.write(input.read())
+        input.close()
+
     def handle_png(self):
         png = open(self.base_path() + "/html/" + self.path)
         self.send_response(200)
@@ -137,6 +145,10 @@ class LightsHandler(BaseHTTPRequestHandler):
             # A request to set a specific sequence file
             if requested_path.endswith(".seq"):
                 return self.handle_seq()
+
+            # Print the current active sequence to the client
+            if requested_path == "/active":
+                return self.handle_active()
  
             # A request to set a specific sequence file
             if requested_path.endswith(".png"):
