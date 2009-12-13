@@ -13,7 +13,9 @@ import re
 
 class LightsHandler(BaseHTTPRequestHandler):
     def base_path(self):
-        return os.path.abspath( os.path.dirname(__file__) + "/..")
+        return "/home/lights/batshitlights"
+        # This doesn't work with the way we run on lights.nb.  Eh?
+        # return os.path.abspath( os.path.dirname(__file__) + "/..")
 
     def params(self, s):
         d = dict( map(lambda s:s.split("=", 2), s.split("&")) )
