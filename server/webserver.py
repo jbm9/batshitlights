@@ -73,7 +73,47 @@ class LightsHandler(BaseHTTPRequestHandler):
         png.close()
         return
 
+    def unpack_seq_string(self, s):
+        pos = 0
+
+        retval = []
+        curval = 0
+
+        for c in s:
+            pos = (pos + 1) % 2
+            curval = curval * 16
+            curval = curval + int(c, 0x10)
+            if pos == 0:
+                retval.append(curval)
+                curval = 0
+        return retval
+
+    def i_to_s_bits(self, i):
+        s = ""
+
+        for x in range(8):
+            j = i & 1
+            i = i / 2
+            s = repr(j) + s
+        return s
+
     def handle_run_one(self):
+        params = self.params(self.parsed_path[4])
+        self.log_message("params = " + repr(params))
+        delay = params["delay"]
+        seq_s = params["seq"]
+        seq = self.unpack_seq_string(seq_s)
+        self.log_message("seq = " + repr(map(self.i_to_s_bits,seq)))
+
+        output = open(self.base_path() + "/sequences/active", "w")
+        output.write(str(delay))
+        output.write("\n")
+        for s in seq:
+            output.write(self.i_to_s_bits(s))
+            output.write("\n")
+        output.close
+
+        self.handle_root()
         return
 
 
@@ -87,6 +127,8 @@ class LightsHandler(BaseHTTPRequestHandler):
             if requested_path == "/":
                 return self.handle_root()
 
+            # /run_one?delay=666&seq=0102ff 
+            # anonymously adds a new sequence with the given delay and bitmasks
             if requested_path == "/run_one":
                 return self.handle_run_one()
 
