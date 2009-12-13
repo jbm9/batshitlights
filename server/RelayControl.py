@@ -67,7 +67,7 @@ class SerialRelayControl(RelayControl):
 
     # status is an integer representing the 8b bitmask of relays
     def setstate_bulk(self, status):
-        outstr = "R%02X"  % (status & 0xff)
+        outstr = "R%02X\r"  % (status & 0xff)
         rclog.debug("SERIAL outstring = " + outstr)
         self.ser.write(outstr)    
         response = self.ser.readline()
