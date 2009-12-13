@@ -58,12 +58,16 @@ class LightsHandler(BaseHTTPRequestHandler):
         self.wfile.write(displayhtml.read())
         displayhtml.close()
 
+        self.restart_fileloop()
+        return
+
+    def restart_fileloop(self):
         # Total kludge to restart fileloop.py, and get the new sequence
         # running faster.  Otherwise, we need to wait for the current
         # sequence to finish before it re-reads the file again.
         #os.system('kill -HUP $(cat /var/run/fileloop.py) &> /dev/null')
         os.system('sudo svc -t /etc/service/fileloop')
-        return
+         
 
     def handle_active(self):
         input = open(self.base_path() + "/sequences/active")
@@ -122,6 +126,7 @@ class LightsHandler(BaseHTTPRequestHandler):
             output.write(self.i_to_s_bits(s))
             output.write("\n")
         output.close
+        self.restart_fileloop()
 
         self.handle_root()
         return
