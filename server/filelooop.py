@@ -31,8 +31,9 @@ while True:
     for line in f:
         tokens = line.strip().split()
         command = tokens[0]
+        command = command[::-1]  # reverse the line.  don't ask.
         delay = len(tokens) > 1 and int(tokens[1]) or globaldelay
-        updatestate(rc, line)
+        updatestate(rc, command)
         if (delay < 50):
             delay = 50
         time.sleep(delay/1000.0)
