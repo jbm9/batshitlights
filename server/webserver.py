@@ -38,7 +38,7 @@ class LightsHandler(BaseHTTPRequestHandler):
         for f in sorted(files):
             #self.wfile.write("<li><a href=/%s.seq>%s</a></li>\n" % (f,f) )
             #self.wfile.write("<li><a href='javascript:bgsend(\"%s\")'>%s</a></li>\n" % (f,f) )
-            self.wfile.write("<li><a href='/%s.seq' onclick='bgsend(\"%s\");return false' rel=\"nofollow\">%s</a></li>\n" % (f, f,f) )
+            self.wfile.write("<li><a href='/sequence/%s.seq' onclick='bgsend(\"%s\");return false' rel=\"nofollow\">%s</a></li>\n" % (f, f,f) )
 
         footer = open(self.base_path() + "/html/footer.html")
         self.wfile.write(footer.read())
@@ -46,7 +46,11 @@ class LightsHandler(BaseHTTPRequestHandler):
         return
 
     def handle_seq(self):
-        input = open(self.base_path() + "/sequences" + self.path)
+        file = self.path
+        p = re.compile('^/sequence/')
+        p.sub('/', file)
+
+        input = open(self.base_path() + "/sequences" + file)
         output = open(self.base_path() + "/sequences/active", "w")
         output.write(input.read())
         input.close()
@@ -87,6 +91,16 @@ class LightsHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(png.read())
         png.close()
+        return
+
+    def handle_txt(self):
+        txt = open(self.base_path() + "/html/" + self.path)
+        self.send_response(200)
+        self.send_header('Content-type','text/plain')
+        self.send_header('Content-Length', os.fstat(txt.fileno())[6])
+        self.end_headers()
+        self.wfile.write(txt.read())
+        txt.close()
         return
 
     def unpack_seq_string(self, s):
@@ -157,9 +171,12 @@ class LightsHandler(BaseHTTPRequestHandler):
             if requested_path == "/active":
                 return self.handle_active()
  
-            # A request to set a specific sequence file
             if requested_path.endswith(".png"):
                 return self.handle_png()
+
+            if requested_path.endswith(".txt"):
+                return self.handle_txt()
+
         #except: 
         except IOError:
             self.send_error(400,'Something bad happened: %s' % self.path)
