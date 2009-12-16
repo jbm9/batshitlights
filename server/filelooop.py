@@ -33,6 +33,8 @@ while True:
         command = tokens[0]
         delay = len(tokens) > 1 and int(tokens[1]) or globaldelay
         updatestate(rc, line)
+        if (delay < 50):
+            delay = 50
         time.sleep(delay/1000.0)
 
     #sys.exit(0)
