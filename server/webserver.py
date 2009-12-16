@@ -36,7 +36,8 @@ class LightsHandler(BaseHTTPRequestHandler):
         header.close()
 
         for f in sorted(files):
-            self.wfile.write("<li><a href=/%s.seq>%s</a></li>\n" % (f,f) )
+            #self.wfile.write("<li><a href=/%s.seq>%s</a></li>\n" % (f,f) )
+            self.wfile.write("<li><a href='javascript:bgsend(\"%s\")'>%s</a></li>\n" % (f,f) )
 
         footer = open(self.base_path() + "/html/footer.html")
         self.wfile.write(footer.read())

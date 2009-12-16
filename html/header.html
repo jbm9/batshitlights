@@ -22,6 +22,24 @@ font-size: 15px; font-family: monospace
 
 </style>
 
+<script language="Javascript">
+function bgsend(seq) {
+    var xmlHttpReq = false;
+    var self = this;
+    // Mozilla/Safari
+    if (window.XMLHttpRequest) {
+        self.xmlHttpReq = new XMLHttpRequest();
+    }
+    // IE
+    else if (window.ActiveXObject) {
+        self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    self.xmlHttpReq.open('GET', 'http://lights.noisebridge.net/' + seq + '.seq', true);
+    self.xmlHttpReq.onreadystatechange = function() { return; }
+    self.xmlHttpReq.send();
+}
+</script>
+
 </head>
 <body>
 
