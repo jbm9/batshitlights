@@ -91,6 +91,16 @@ class LightsHandler(BaseHTTPRequestHandler):
         png.close()
         return
 
+    def handle_icon(self):
+        icon = open(self.base_path() + "/html/" + self.path)
+        self.send_response(200)
+        self.send_header('Content-type','image/x-icon')
+        self.send_header('Content-Length', os.fstat(icon.fileno())[6])
+        self.end_headers()
+        self.wfile.write(icon.read())
+        icon.close()
+        return
+
     def handle_txt(self):
         txt = open(self.base_path() + "/html/" + self.path)
         self.send_response(200)
@@ -171,6 +181,9 @@ class LightsHandler(BaseHTTPRequestHandler):
  
             if requested_path.endswith(".png"):
                 return self.handle_png()
+
+            if requested_path.endswith(".ico"):
+                return self.handle_icon()
 
             if requested_path.endswith(".txt"):
                 return self.handle_txt()
