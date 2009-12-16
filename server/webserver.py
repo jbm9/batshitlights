@@ -175,6 +175,8 @@ class LightsHandler(BaseHTTPRequestHandler):
             if requested_path.endswith(".txt"):
                 return self.handle_txt()
 
+            self.send_error(404, "You're better off without that file.  Trust me.")
+
         #except: 
         except IOError:
             self.send_error(400,'Something bad happened: %s' % self.path)
