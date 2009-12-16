@@ -27,7 +27,6 @@ class LightsHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         p = re.compile('\.seq$')
-        p.sub('', "foo.seq")
 
         files = [ p.sub('', f) for f in listdir(self.base_path() + "/sequences") if f.endswith(".seq") ]
 
@@ -38,7 +37,7 @@ class LightsHandler(BaseHTTPRequestHandler):
         for f in sorted(files):
             #self.wfile.write("<li><a href=/%s.seq>%s</a></li>\n" % (f,f) )
             #self.wfile.write("<li><a href='javascript:bgsend(\"%s\")'>%s</a></li>\n" % (f,f) )
-            self.wfile.write("<li><a href='/sequence/%s.seq' onclick='bgsend(\"sequence/%s\");return false' rel=\"nofollow\">%s</a></li>\n" % (f, f,f) )
+            self.wfile.write("<li><a href='/sequences/%s.seq' onclick='bgsend(\"sequences/%s\");return false' rel=\"nofollow\">%s</a></li>\n" % (f, f,f) )
 
         footer = open(self.base_path() + "/html/footer.html")
         self.wfile.write(footer.read())
@@ -46,9 +45,8 @@ class LightsHandler(BaseHTTPRequestHandler):
         return
 
     def handle_seq(self):
-        file = self.path
-        p = re.compile('^/sequence/')
-        p.sub('/', file)
+        p = re.compile('sequences/')
+        file = p.sub('', self.path)
 
         input = open(self.base_path() + "/sequences" + file)
         output = open(self.base_path() + "/sequences/active", "w")
