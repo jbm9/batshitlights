@@ -155,7 +155,6 @@ class LightsHandler(BaseHTTPRequestHandler):
         self.handle_root()
         return
 
-
     def do_GET(self):
         try:
             self.parsed_path = urlparse(self.path)
@@ -190,8 +189,8 @@ class LightsHandler(BaseHTTPRequestHandler):
 
             self.send_error(404, "You're better off without that file.  Trust me.")
 
-        #except: 
-        except IOError:
+        #except IOError:
+        except: 
             self.send_error(400,'Something bad happened: %s' % self.path)
             raise
 
