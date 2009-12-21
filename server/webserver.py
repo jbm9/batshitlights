@@ -159,7 +159,7 @@ class LightsHandler(BaseHTTPRequestHandler):
         try:
             self.parsed_path = urlparse(self.path)
             referer = self.headers.get('referer')
-            self.log_message("referer: " + referer)
+            self.log_message("referer: " + str(referer))
 
             requested_path = self.parsed_path[2]
 
