@@ -2,6 +2,10 @@ import sys
 import ConfigParser
 import logging
 
+# This is for the Quasar 3108:
+#  http://www.quasarelectronics.com/3108-8-channel-serial-relay-controller-isolated-io-board.htm
+# datasheet/reference:
+#   http://www.quasarelectronics.com/kit-files/electronic-kit/3108v3.pdf
 
 rclog = logging.getLogger("serverlog.rc")
 
@@ -58,6 +62,14 @@ class SerialRelayControl(RelayControl):
         rclog.debug("SERIAL outstring = " + outstr)
         self.ser.write(outstr)    
         # and now eat up command echo
+        response = self.ser.readline()
+        rclog.debug("echo: " + response.strip())
+
+    # status is an integer representing the 8b bitmask of relays
+    def setstate_bulk(self, status):
+        outstr = "R%02X\r"  % (status & 0xff)
+        rclog.debug("SERIAL outstring = " + outstr)
+        self.ser.write(outstr)    
         response = self.ser.readline()
         rclog.debug("echo: " + response.strip())
 

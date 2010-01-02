@@ -22,10 +22,30 @@ font-size: 15px; font-family: monospace
 
 </style>
 
+<script language="Javascript">
+function bgsend(seq) {
+    var xmlHttpReq = false;
+    var self = this;
+    // Mozilla/Safari
+    if (window.XMLHttpRequest) {
+        self.xmlHttpReq = new XMLHttpRequest();
+    }
+    // IE
+    else if (window.ActiveXObject) {
+        self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    self.xmlHttpReq.open('GET', 'http://lights.noisebridge.net/' + seq + '.seq', true);
+    self.xmlHttpReq.onreadystatechange = function() { return; }
+    self.xmlHttpReq.send();
+}
+</script>
+
 </head>
 <body>
 
-<img src="wreath.png" width=300 height=298>
+<img src="http://michael.toren.net/images/wreath.png" width=300 height=298>
+<img src="http://lights.noisebridge.net:443/stream.jpg">
+<br clear=all>
 
 <p align="left"> Welcome to <a href=https://www.noisebridge.net/>Noisebridge</a> Light
 Control! </p>

@@ -1,7 +1,7 @@
 #!/bin/bash
 exec 2>&1
 export LANG=C
-sleep 1
+sleep 0
 echo $$ > /var/run/fileloop.py
 cd /home/lights/batshitlights/server
 exec setuidgid lights python -u filelooop.py

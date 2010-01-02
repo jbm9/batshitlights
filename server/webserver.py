@@ -27,7 +27,6 @@ class LightsHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         p = re.compile('\.seq$')
-        p.sub('', "foo.seq")
 
         files = [ p.sub('', f) for f in listdir(self.base_path() + "/sequences") if f.endswith(".seq") ]
 
@@ -36,7 +35,9 @@ class LightsHandler(BaseHTTPRequestHandler):
         header.close()
 
         for f in sorted(files):
-            self.wfile.write("<li><a href=/%s.seq>%s</a></li>\n" % (f,f) )
+            #self.wfile.write("<li><a href=/%s.seq>%s</a></li>\n" % (f,f) )
+            #self.wfile.write("<li><a href='javascript:bgsend(\"%s\")'>%s</a></li>\n" % (f,f) )
+            self.wfile.write("<li><a href='/sequences/%s.seq' onclick='bgsend(\"sequences/%s\");return false' rel=\"nofollow\">%s</a></li>\n" % (f, f,f) )
 
         footer = open(self.base_path() + "/html/footer.html")
         self.wfile.write(footer.read())
@@ -44,7 +45,10 @@ class LightsHandler(BaseHTTPRequestHandler):
         return
 
     def handle_seq(self):
-        input = open(self.base_path() + "/sequences" + self.path)
+        p = re.compile('sequences/')
+        file = p.sub('', self.path)
+
+        input = open(self.base_path() + "/sequences" + file)
         output = open(self.base_path() + "/sequences/active", "w")
         output.write(input.read())
         input.close()
@@ -58,12 +62,24 @@ class LightsHandler(BaseHTTPRequestHandler):
         self.wfile.write(displayhtml.read())
         displayhtml.close()
 
+        self.restart_fileloop()
+        return
+
+    def restart_fileloop(self):
         # Total kludge to restart fileloop.py, and get the new sequence
         # running faster.  Otherwise, we need to wait for the current
         # sequence to finish before it re-reads the file again.
         #os.system('kill -HUP $(cat /var/run/fileloop.py) &> /dev/null')
         os.system('sudo svc -t /etc/service/fileloop')
-        return
+         
+
+    def handle_active(self):
+        input = open(self.base_path() + "/sequences/active")
+        self.send_response(200)
+        self.send_header('Content-type','text/plain')
+        self.end_headers()
+        self.wfile.write(input.read())
+        input.close()
 
     def handle_png(self):
         png = open(self.base_path() + "/html/" + self.path)
@@ -73,6 +89,26 @@ class LightsHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(png.read())
         png.close()
+        return
+
+    def handle_icon(self):
+        icon = open(self.base_path() + "/html/" + self.path)
+        self.send_response(200)
+        self.send_header('Content-type','image/x-icon')
+        self.send_header('Content-Length', os.fstat(icon.fileno())[6])
+        self.end_headers()
+        self.wfile.write(icon.read())
+        icon.close()
+        return
+
+    def handle_txt(self):
+        txt = open(self.base_path() + "/html/" + self.path)
+        self.send_response(200)
+        self.send_header('Content-type','text/plain')
+        self.send_header('Content-Length', os.fstat(txt.fileno())[6])
+        self.end_headers()
+        self.wfile.write(txt.read())
+        txt.close()
         return
 
     def unpack_seq_string(self, s):
@@ -114,14 +150,16 @@ class LightsHandler(BaseHTTPRequestHandler):
             output.write(self.i_to_s_bits(s))
             output.write("\n")
         output.close
+        self.restart_fileloop()
 
         self.handle_root()
         return
 
-
     def do_GET(self):
         try:
             self.parsed_path = urlparse(self.path)
+            referer = self.headers.get('referer')
+            self.log_message("referer: " + str(referer))
 
             requested_path = self.parsed_path[2]
 
@@ -137,12 +175,24 @@ class LightsHandler(BaseHTTPRequestHandler):
             # A request to set a specific sequence file
             if requested_path.endswith(".seq"):
                 return self.handle_seq()
+
+            # Print the current active sequence to the client
+            if requested_path == "/active":
+                return self.handle_active()
  
-            # A request to set a specific sequence file
             if requested_path.endswith(".png"):
                 return self.handle_png()
-        #except: 
-        except IOError:
+
+            if requested_path.endswith(".ico"):
+                return self.handle_icon()
+
+            if requested_path.endswith(".txt"):
+                return self.handle_txt()
+
+            self.send_error(404, "You're better off without that file.  Trust me.")
+
+        #except IOError:
+        except: 
             self.send_error(400,'Something bad happened: %s' % self.path)
             raise
 
